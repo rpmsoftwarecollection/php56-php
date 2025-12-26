@@ -139,7 +139,7 @@
 %endif
 
 Summary: PHP scripting language for creating dynamic web sites
-Name: %{?scl_prefix}php
+Name: php56-php
 Version: 5.6.40
 Release: 45%{?dist}
 # All files licensed under PHP version 3.01, except
@@ -284,13 +284,14 @@ Patch302: php-openssl-cert.patch
 
 # WIP
 
+BuildRequires: scl-utils-build php56-build php56-runtime php56-scldevel
 BuildRequires: bzip2-devel, curl-devel >= 7.9, %{db_devel}
 BuildRequires: httpd-devel >= 2.0.46-1, pam-devel
 %if %{with_httpd2410}
 # to ensure we are using httpd with filesystem feature (see #1081453)
 BuildRequires: httpd-filesystem
 %endif
-BuildRequires: libstdc++-devel, openssl-devel
+BuildRequires: libstdc++-devel, %{?scl_prefix}openssl-devel
 %if %{with_sqlite3}
 # For SQLite3 extension
 BuildRequires: sqlite-devel >= 3.6.0
@@ -505,7 +506,7 @@ Requires: libtool
 Requires: krb5-devel%{?_isa}
 Requires: libedit-devel%{?_isa}
 Requires: libxml2-devel%{?_isa}
-Requires: openssl-devel%{?_isa}
+Requires: %{?scl_prefix}openssl-devel%{?_isa}
 %if %{with_libpcre}
 Requires: pcre-devel%{?_isa} >= 8.20
 %endif
@@ -543,7 +544,7 @@ Group: Development/Languages
 # All files licensed under PHP version 3.01
 License: PHP
 Requires: %{?scl_prefix}php-common%{?_isa} = %{version}-%{release}
-BuildRequires: krb5-devel, openssl-devel, libc-client-devel
+BuildRequires: krb5-devel, %{?scl_prefix}openssl-devel, libc-client-devel
 
 %description imap
 The %{?scl_prefix}php-imap module will add IMAP (Internet Message Access Protocol)
@@ -557,7 +558,7 @@ Group: Development/Languages
 # All files licensed under PHP version 3.01
 License: PHP
 Requires: %{?scl_prefix}php-common%{?_isa} = %{version}-%{release}
-BuildRequires: cyrus-sasl-devel, openldap-devel, openssl-devel
+BuildRequires: cyrus-sasl-devel, openldap-devel, %{?scl_prefix}openssl-devel
 
 %description ldap
 The %{?scl_prefix}php-ldap package adds Lightweight Directory Access Protocol (LDAP)
@@ -616,7 +617,7 @@ License: PHP
 Requires: %{?scl_prefix}php-pdo%{?_isa} = %{version}-%{release}
 Provides: %{?scl_prefix}php_database
 Provides: %{?scl_prefix}php-pdo_pgsql, %{?scl_prefix}php-pdo_pgsql%{?_isa}
-BuildRequires: krb5-devel, openssl-devel, postgresql-devel
+BuildRequires: krb5-devel, %{?scl_prefix}openssl-devel, postgresql-devel
 
 %description pgsql
 The %{?scl_prefix}php-pgsql package add PostgreSQL database support to PHP.
