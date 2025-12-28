@@ -1289,7 +1289,7 @@ ln -sf ../configure
 %endif
     --without-gdbm \
     --with-jpeg-dir=%{_root_prefix} \
-    --with-openssl=/opt/remi/php56/root/usr \
+    --with-openssl=%{_prefix} \
     --with-system-ciphers \
 %if %{with_libpcre}
     --with-pcre-regex=%{_root_prefix} \
