@@ -746,8 +746,8 @@ Summary: A module for PHP applications that query SNMP-managed devices
 Group: Development/Languages
 # All files licensed under PHP version 3.01
 License: PHP
-Requires: %{?scl_prefix}php-common%{?_isa} = %{version}-%{release}, php56-net-snmp
-BuildRequires: php56-net-snmp-devel
+Requires: %{?scl_prefix}php-common%{?_isa} = %{version}-%{release}, net-snmp
+BuildRequires: net-snmp-devel
 
 %description snmp
 The %{?scl_prefix}php-snmp package contains a dynamic shared object that will add
