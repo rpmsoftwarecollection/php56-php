@@ -978,6 +978,7 @@ support for using the enchant library to PHP.
 
 %setup -q -n php-%{version}%{?rcver}
 
+%{?scl:scl enable %{scl} - << \EOG}
 %patch -P1 -p1 -b .mpmcheck
 %patch -P2 -p1 -b .fb_config
 %if 0%{?fedora} >= 26 || 0%{?rhel} >= 8
@@ -1223,9 +1224,10 @@ cp %{SOURCE50} 10-opcache.ini
 cp %{SOURCE51} .
 sed -e 's:%{_root_sysconfdir}:%{_sysconfdir}:' \
     -i 10-opcache.ini
-
+%{?scl:EOG}
 
 %build
+%{?scl:scl enable %{scl} - << \EOG}
 # This package fails to build with LTO due to undefined symbols.  LTO
 # was disabled in OpenSuSE as well, but with no real explanation why
 # beyond the undefined symbols.  It really shold be investigated further.
@@ -1460,9 +1462,11 @@ build --enable-embed \
       --disable-pdo \
       ${without_shared}
 popd
+%{?scl:EOG}
 
 
 %check
+%{?scl:scl enable %{scl} - << \EOG}
 %if %runselftest
 cd build-fpm
 
@@ -1486,8 +1490,11 @@ if ! make test; then
 fi
 unset NO_INTERACTION REPORT_EXIT_STATUS MALLOC_CHECK_
 %endif
+%{?scl:EOG}
+
 
 %install
+%{?scl:scl enable %{scl} - << \EOG}
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 
 # Install the version for embedded script language in applications + php_embed.h
@@ -1765,10 +1772,12 @@ rm -rf $RPM_BUILD_ROOT%{_libdir}/php/modules/*.a \
 
 # Remove irrelevant docs
 rm -f README.{Zeus,QNX,CVS-RULES}
+%{?scl:EOG}
 
 
 %if ! %{with_httpd2410}
 %pre fpm
+%{?scl:scl enable %{scl} - << \EOG}
 # Add the "apache" user (to avoid pulling httpd in our dep)
 getent group  apache >/dev/null || \
   groupadd -g 48 -r apache
@@ -1776,9 +1785,11 @@ getent passwd apache >/dev/null || \
   useradd -r -u 48 -g apache -s /sbin/nologin \
     -d %{_httpd_contentdir} -c "Apache" apache
 exit 0
+%{?scl:EOG}
 %endif
 
 %post fpm
+%{?scl:scl enable %{scl} - << \EOG}
 %if 0%{?systemd_post:1}
 %systemd_post %{?scl:%{scl}-}php-fpm.service
 %else
@@ -1791,8 +1802,10 @@ if [ $1 = 1 ]; then
 %endif
 fi
 %endif
+%{?scl:EOG}
 
 %preun fpm
+%{?scl:scl enable %{scl} - << \EOG}
 %if 0%{?systemd_preun:1}
 %systemd_preun %{?scl:%{scl}-}php-fpm.service
 %else
@@ -1807,9 +1820,11 @@ if [ $1 = 0 ]; then
 %endif
 fi
 %endif
+%{?scl:EOG}
 
 %if 0%{?fedora} < 27 && 0%{?rhel} < 8
 %postun fpm
+%{?scl:scl enable %{scl} - << \EOG}
 %if %{with_systemd}
 %systemd_postun_with_restart %{?scl:%{scl}-}php-fpm.service
 %else
@@ -1817,9 +1832,11 @@ if [ $1 -ge 1 ]; then
     /sbin/service %{?scl_prefix}php-fpm condrestart >/dev/null 2>&1 || :
 fi
 %endif
+%{?scl:EOG}
 %endif
 
 %if 0%{?fedora} >= 27 || 0%{?rhel} >= 8
+%{?scl:scl enable %{scl} - << \EOG}
 # Raised by new pool installation or new extension installation
 %transfiletriggerin fpm -- %{_sysconfdir}/php-fpm.d %{_sysconfdir}/php.d
 systemctl try-restart %{?scl:%{scl}-}php-fpm.service >/dev/null 2>&1 || :
@@ -1840,12 +1857,15 @@ if [ -f /etc/rc.d/init.d/%{?scl_prefix}php-fpm ]; then
     /sbin/chkconfig --del %{?scl_prefix}php-fpm >/dev/null 2>&1 || :
     /bin/systemctl try-restart %{?scl_prefix}php-fpm.service >/dev/null 2>&1 || :
 fi
+%{?scl:EOG}
 %endif
 
 
 %if 0%{?fedora} < 28 && 0%{?rhel} < 8
+%{?scl:scl enable %{scl} - << \EOG}
 %post   embedded -p /sbin/ldconfig
 %postun embedded -p /sbin/ldconfig
+%{?scl:EOG}
 %endif
 
 
