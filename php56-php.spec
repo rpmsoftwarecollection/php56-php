@@ -907,11 +907,11 @@ Group: System Environment/Libraries
 # All files licensed under PHP version 3.01
 License: PHP
 Requires: %{?scl_prefix}php-common%{?_isa} = %{version}-%{release}
-%if 0%{?fedora} >= 36 || 0%{?rhel} >= 9
-BuildRequires: php56-recode-devel
-%else
+#%if 0%{?fedora} >= 36 || 0%{?rhel} >= 9
+#BuildRequires: php56-recode-devel
+#%else
 BuildRequires: recode-devel
-%endif
+#%endif
 
 %description recode
 The %{?scl_prefix}php-recode package contains a dynamic shared object that will add
