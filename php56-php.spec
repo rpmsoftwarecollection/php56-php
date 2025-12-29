@@ -269,7 +269,9 @@ BuildRequires: httpd-devel >= 2.0.46-1, pam-devel
 BuildRequires: httpd-filesystem
 %endif
 BuildRequires: libstdc++-devel, openssl-devel
+%if 0%{?fedora} >= 36 || 0%{?rhel} >= 9
 BuildRequires: compat-openssl11-devel
+%endif
 %if %{with_sqlite3}
 # For SQLite3 extension
 BuildRequires: sqlite-devel >= 3.6.0
@@ -1201,10 +1203,11 @@ touch configure.in
 ./buildconf --force
 
 CFLAGS="$RPM_OPT_FLAGS -fno-strict-aliasing -Wno-pointer-sign"
+%if 0%{?fedora} >= 36 || 0%{?rhel} >= 9
 CFLAGS="-I%{_root_includedir}/openssl11 $CFLAGS"
 LDFLAGS="-L%{_root_libdir}/openssl11 $LDFLAGS"
 export LDFLAGS
-
+%endif
 export CFLAGS
 
 # Install extension modules in %{_libdir}/php/modules.
