@@ -20,6 +20,9 @@
 %global _root_prefix      %{_prefix}
 %global _root_initddir    %{_initddir}
 %endif
+%global _scl_prefix /opt/remi
+%global _scl_vendor remi
+%global scl_vendor remi
 
 # API/ABI check
 %global apiver      20131106
