@@ -29,8 +29,6 @@
 %global zendver     20131226
 %global pdover      20080721
 # Extension version
-%global opcachever  7.0.6-dev
-%global oci8ver     2.0.12
 
 # Use for first build of PHP (before pecl/zip and pecl/jsonc)
 %bcond_with bootstrap
@@ -62,17 +60,7 @@
 
 %global mysql_sock %(mysql_config --socket  2>/dev/null || echo /var/lib/mysql/mysql.sock)
 
-%ifarch aarch64
-%global oraclever 19.24
-%global oraclemax 20
-%global oraclelib 19.1
-%global oracledir 19.24
-%else
-%global oraclever 23.6
-%global oraclemax 24
-%global oraclelib 23.1
-%global oracledir 23
-%endif
+%global opcachever  7.0.6-dev
 
 # Build for LiteSpeed Web Server (LSAPI)
 %global with_lsws     1
@@ -89,7 +77,6 @@
 %global mysql_config %{_root_libdir}/mysql/mysql_config
 
 # Optional components; pass "--with mssql" etc to rpmbuild.
-%global with_oci8     %{?_with_oci8:1}%{!?_with_oci8:0}
 
 %global with_imap      1
 %global with_interbase 1
@@ -142,9 +129,9 @@
 %endif
 
 Summary: PHP scripting language for creating dynamic web sites
-Name: %{?scl_prefix}php
+Name: php56-php
 Version: 5.6.40
-Release: 45%{?dist}
+Release: 46%{?dist}
 # All files licensed under PHP version 3.01, except
 # Zend is licensed under Zend
 # TSRM is licensed under BSD
@@ -287,35 +274,10 @@ Patch302: php-openssl-cert.patch
 
 # WIP
 
-BuildRequires: bzip2-devel, curl-devel >= 7.9, %{db_devel}
-BuildRequires: httpd-devel >= 2.0.46-1, pam-devel
+BuildRequires: httpd-devel >= 2.0.46-1, php56-runtime, php56-scldevel, php56-build
 %if %{with_httpd2410}
 # to ensure we are using httpd with filesystem feature (see #1081453)
 BuildRequires: httpd-filesystem
-%endif
-BuildRequires: libstdc++-devel, openssl-devel
-%if %{with_sqlite3}
-# For SQLite3 extension
-BuildRequires: sqlite-devel >= 3.6.0
-%else
-# Enough for pdo_sqlite
-BuildRequires: sqlite-devel >= 3.0.0
-%endif
-BuildRequires: zlib-devel, smtpdaemon, libedit-devel
-%if %{with_libpcre}
-BuildRequires: pcre-devel >= 8.20
-%endif
-BuildRequires: bzip2
-BuildRequires: perl
-BuildRequires: autoconf
-BuildRequires: automake
-BuildRequires: make
-BuildRequires: gcc
-BuildRequires: gcc-c++
-BuildRequires: libtool
-BuildRequires: libtool-ltdl-devel
-%if %{with_dtrace}
-BuildRequires: systemtap-sdt-devel
 %endif
 Requires: httpd-mmn = %{_httpd_mmn}
 Provides: %{?scl_prefix}mod_php = %{version}-%{release}
@@ -379,7 +341,6 @@ The %{?scl_prefix}php-dbg package contains the interactive PHP debugger.
 %package fpm
 Group: Development/Languages
 Summary: PHP FastCGI Process Manager
-BuildRequires: libacl-devel
 %if ! %{with_httpd2410}
 Requires(pre): %{_root_sbindir}/useradd
 %endif
@@ -498,21 +459,7 @@ Group: Development/Libraries
 Summary: Files needed for building PHP extensions
 Requires: %{?scl_prefix}php-cli%{?_isa} = %{version}-%{release}
 # always needed to build extension
-Requires: autoconf
-Requires: automake
-Requires: make
-Requires: gcc
-Requires: gcc-c++
-Requires: libtool
-# see "php-config --libs"
-Requires: krb5-devel%{?_isa}
-Requires: libedit-devel%{?_isa}
-Requires: libxml2-devel%{?_isa}
-Requires: openssl-devel%{?_isa}
-%if %{with_libpcre}
-Requires: pcre-devel%{?_isa} >= 8.20
-%endif
-Requires: zlib-devel%{?_isa}
+Requires: php56-runtime, php56-scldevel, php56-build
 %if %{without  bootstrap}
 Requires: %{?scl_prefix}php-pecl-jsonc-devel%{?_isa}
 %endif
@@ -546,7 +493,6 @@ Group: Development/Languages
 # All files licensed under PHP version 3.01
 License: PHP
 Requires: %{?scl_prefix}php-common%{?_isa} = %{version}-%{release}
-BuildRequires: krb5-devel, openssl-devel, libc-client-devel
 
 %description imap
 The %{?scl_prefix}php-imap module will add IMAP (Internet Message Access Protocol)
@@ -560,7 +506,6 @@ Group: Development/Languages
 # All files licensed under PHP version 3.01
 License: PHP
 Requires: %{?scl_prefix}php-common%{?_isa} = %{version}-%{release}
-BuildRequires: cyrus-sasl-devel, openldap-devel, openssl-devel
 
 %description ldap
 The %{?scl_prefix}php-ldap package adds Lightweight Directory Access Protocol (LDAP)
@@ -619,7 +564,6 @@ License: PHP
 Requires: %{?scl_prefix}php-pdo%{?_isa} = %{version}-%{release}
 Provides: %{?scl_prefix}php_database
 Provides: %{?scl_prefix}php-pdo_pgsql, %{?scl_prefix}php-pdo_pgsql%{?_isa}
-BuildRequires: krb5-devel, openssl-devel, postgresql-devel
 
 %description pgsql
 The %{?scl_prefix}php-pgsql package add PostgreSQL database support to PHP.
@@ -655,7 +599,6 @@ License: PHP
 Requires: %{?scl_prefix}php-pdo%{?_isa} = %{version}-%{release}
 Provides: %{?scl_prefix}php_database
 Provides: %{?scl_prefix}php-pdo_odbc, %{?scl_prefix}php-pdo_odbc%{?_isa}
-BuildRequires: unixODBC-devel
 
 %description odbc
 The %{?scl_prefix}php-odbc package contains a dynamic shared object that will add
@@ -672,7 +615,6 @@ Group: Development/Languages
 # All files licensed under PHP version 3.01
 License: PHP
 Requires: %{?scl_prefix}php-common%{?_isa} = %{version}-%{release}
-BuildRequires: libxml2-devel
 
 %description soap
 The %{?scl_prefix}php-soap package contains a dynamic shared object that will add
@@ -684,7 +626,6 @@ Summary: A module for PHP applications that use Interbase/Firebird databases
 Group: Development/Languages
 # All files licensed under PHP version 3.01
 License: PHP
-BuildRequires:  firebird-devel
 Requires: %{?scl_prefix}php-pdo%{?_isa} = %{version}-%{release}
 Provides: %{?scl_prefix}php_database
 Provides: %{?scl_prefix}php-firebird, %{?scl_prefix}php-firebird%{?_isa}
@@ -702,42 +643,6 @@ technical advisors and supporters developing and enhancing a multi-platform
 relational database management system based on the source code released by
 Inprise Corp (now known as Borland Software Corp) under the InterBase Public
 License.
-%endif
-
-%if %{with_oci8}
-%package oci8
-Summary:        A module for PHP applications that use OCI8 databases
-Group:          Development/Languages
-# All files licensed under PHP version 3.01
-License:        PHP
-%ifarch aarch64
-BuildRequires:  oracle-instantclient%{oraclever}-devel
-# Should requires libclntsh.so.19.1()(aarch-64), but it's not provided by Oracle RPM.
-Requires:       libclntsh.so.%{oraclelib}
-AutoReq:        0
-%else
-BuildRequires: (oracle-instantclient-devel >= %{oraclever} with oracle-instantclient-devel < %{oraclemax})
-%endif
-Requires:       %{?scl_prefix}php-pdo%{?_isa} = %{version}-%{release}
-Provides:       %{?scl_prefix}php_database
-Provides:       %{?scl_prefix}php-pdo_oci, %{?scl_prefix}php-pdo_oci%{?_isa}
-Obsoletes:      %{?scl_prefix}php-pecl-oci8 <  %{oci8ver}
-Conflicts:      %{?scl_prefix}php-pecl-oci8 >= %{oci8ver}
-Provides:       %{?scl_prefix}php-pecl(oci8) = %{oci8ver}, %{?scl_prefix}php-pecl(oci8)%{?_isa} = %{oci8ver}
-
-%description oci8
-The %{?scl_prefix}php-oci8 packages provides the OCI8 extension version %{oci8ver}
-and the PDO driver to access Oracle Database.
-
-The extension is linked with Oracle client libraries %{oraclever}
-(Oracle Instant Client).  For details, see Oracle's note
-"Oracle Client / Server Interoperability Support" (ID 207303.1).
-
-You must install libclntsh.so.%{oraclelib} to use this package,
-provided by Oracle Instant Client RPM available from Oracle on:
-https://www.oracle.com/database/technologies/instant-client/downloads.html
-
-Documentation is at http://php.net/oci8 and http://php.net/pdo_oci
 %endif
 
 %package snmp
@@ -767,7 +672,6 @@ Provides: %{?scl_prefix}php-wddx, %{?scl_prefix}php-wddx%{?_isa}
 Provides: %{?scl_prefix}php-xmlreader, %{?scl_prefix}php-xmlreader%{?_isa}
 Provides: %{?scl_prefix}php-xmlwriter, %{?scl_prefix}php-xmlwriter%{?_isa}
 Provides: %{?scl_prefix}php-xsl, %{?scl_prefix}php-xsl%{?_isa}
-BuildRequires: libxslt-devel >= 1.0.18-1, libxml2-devel >= 2.4.14-1
 
 %description xml
 The %{?scl_prefix}php-xml package contains dynamic shared objects which add support
@@ -812,18 +716,6 @@ License: PHP and BSD
 %endif
 Requires: %{?scl_prefix}php-common%{?_isa} = %{version}-%{release}
 # Required to build the bundled GD library
-BuildRequires: libjpeg-devel, libpng-devel, freetype-devel
-BuildRequires: libXpm-devel
-%if %{with_t1lib}
-BuildRequires: t1lib-devel
-%endif
-%if %{with_libgd}
-BuildRequires: gd-devel >= 2.3.3
-%else
-%if %{with_vpx}
-BuildRequires: libvpx-devel
-%endif
-%endif
 
 %description gd
 The %{?scl_prefix}php-gd package contains a dynamic shared object that will add
@@ -846,7 +738,6 @@ Summary: A module for PHP applications for using the GNU MP library
 Group: Development/Languages
 # All files licensed under PHP version 3.01
 License: PHP
-BuildRequires: gmp-devel
 Requires: %{?scl_prefix}php-common%{?_isa} = %{version}-%{release}
 
 %description gmp
@@ -858,7 +749,6 @@ Summary: A database abstraction layer module for PHP applications
 Group: Development/Languages
 # All files licensed under PHP version 3.01
 License: PHP
-BuildRequires: %{db_devel}, tokyocabinet-devel
 Requires: %{?scl_prefix}php-common%{?_isa} = %{version}-%{release}
 
 %description dba
@@ -872,7 +762,6 @@ Group: Development/Languages
 # All files licensed under PHP version 3.01
 License: PHP
 Requires: %{?scl_prefix}php-common%{?_isa} = %{version}-%{release}
-BuildRequires: libmcrypt-devel
 
 %description mcrypt
 The %{?scl_prefix}php-mcrypt package contains a dynamic shared object that will add
@@ -886,7 +775,6 @@ Group: Development/Languages
 # All files licensed under PHP version 3.01
 License: PHP
 Requires: %{?scl_prefix}php-common%{?_isa} = %{version}-%{release}
-BuildRequires: libtidy-devel
 
 %description tidy
 The %{?scl_prefix}php-tidy package contains a dynamic shared object that will add
@@ -900,7 +788,6 @@ Group: Development/Languages
 # All files licensed under PHP version 3.01
 License: PHP
 Requires: %{?scl_prefix}php-pdo%{?_isa} = %{version}-%{release}
-BuildRequires: freetds-devel
 Provides: %{?scl_prefix}php-pdo_dblib, %{?scl_prefix}php-pdo_dblib%{?_isa}
 Provides: %{?scl_prefix}php-sybase_ct, %{?scl_prefix}php-sybase_ct%{?_isa}
 
@@ -917,7 +804,6 @@ Group: System Environment/Libraries
 # All files licensed under PHP version 3.01
 License: PHP
 Requires: %{?scl_prefix}php-common%{?_isa} = %{version}-%{release}
-BuildRequires: aspell-devel >= 0.50.0
 
 %description pspell
 The %{?scl_prefix}php-pspell package contains a dynamic shared object that will add
@@ -930,7 +816,6 @@ Group: System Environment/Libraries
 # All files licensed under PHP version 3.01
 License: PHP
 Requires: %{?scl_prefix}php-common%{?_isa} = %{version}-%{release}
-BuildRequires: recode-devel
 
 %description recode
 The %{?scl_prefix}php-recode package contains a dynamic shared object that will add
@@ -944,11 +829,6 @@ Group: System Environment/Libraries
 License: PHP
 Requires: %{?scl_prefix}php-common%{?_isa} = %{version}-%{release}
 # Upstream requires 4.0, we require 69.1 to ensure use of libicu69
-%if 0%{?rhel}
-BuildRequires: libicu-devel = 69.1
-%else
-BuildRequires: libicu-devel
-%endif
 
 %description intl
 The %{?scl_prefix}php-intl package contains a dynamic shared object that will add
@@ -961,7 +841,6 @@ Summary: Enchant spelling extension for PHP applications
 License: PHP
 Group: System Environment/Libraries
 Requires: %{?scl_prefix}php-common%{?_isa} = %{version}-%{release}
-BuildRequires: enchant-devel >= 1.2.4
 
 %description enchant
 The %{?scl_prefix}php-enchant package contains a dynamic shared object that will add
@@ -1169,13 +1048,6 @@ if test "x${vpdo}" != "x%{pdover}"; then
 fi
 
 # Check for some extension version
-ver=$(sed -n '/#define PHP_OCI8_VERSION /{s/.* "//;s/".*$//;p}' ext/oci8/php_oci8.h)
-if test "$ver" != "%{oci8ver}"; then
-   : Error: Upstream OCI8 version is now ${ver}, expecting %{oci8ver}.
-   : Update the oci8ver macro and rebuild.
-   exit 1
-fi
-
 ver=$(sed -n '/#define PHP_ZENDOPCACHE_VERSION /{s/.* "//;s/".*$//;p}' ext/opcache/ZendAccelerator.h)
 if test "$ver" != "%{opcachever}"; then
    : Error: Upstream OPCACHE version is now ${ver}, expecting %{opcachever}.
@@ -1352,10 +1224,6 @@ build --libdir=%{_libdir}/php \
       --with-mysql=shared,mysqlnd \
       --with-mysqli=shared,mysqlnd \
       --with-mysql-sock=%{mysql_sock} \
-%if %{with_oci8}
-         --with-oci8=shared,instantclient,%{_root_prefix}/lib/oracle/%{oracledir}/client64/lib,%{oraclever} \
-      --with-pdo-oci=shared,instantclient,%{_root_prefix},%{oraclever} \
-%endif
 %if %{with_interbase}
       --with-interbase=shared \
       --with-pdo-firebird=shared \
@@ -1650,9 +1518,6 @@ for mod in pgsql odbc ldap snmp xmlrpc \
 %if %{with_sqlite3}
     sqlite3 \
 %endif
-%if %{with_oci8}
-    oci8 pdo_oci \
-%endif
 %if %{with_interbase}
     interbase pdo_firebird \
 %endif
@@ -1722,9 +1587,6 @@ cat files.sybase_ct >> files.mssql
 %endif
 cat files.pdo_pgsql >> files.pgsql
 cat files.pdo_odbc >> files.odbc
-%if %{with_oci8}
-cat files.pdo_oci >> files.oci8
-%endif
 %if %{with_interbase}
 cat files.pdo_firebird >> files.interbase
 %endif
@@ -2025,9 +1887,6 @@ EOF
 %files mysqlnd -f files.mysqlnd
 %files opcache -f files.opcache
 %config(noreplace) %{_sysconfdir}/php.d/opcache-default.blacklist
-%if %{with_oci8}
-%files oci8 -f files.oci8
-%endif
 
 
 %changelog
