@@ -1103,11 +1103,11 @@ sed -e 's:%{_root_sysconfdir}:%{_sysconfdir}:' \
 %define _lto_cflags %{nil}
 
 # aclocal workaround - to be improved
-cat `aclocal --print-ac-dir`/{libtool,ltoptions,ltsugar,ltversion,lt~obsolete}.m4 >>aclocal.m4
+cat `%{_bindir}/aclocal --print-ac-dir`/{libtool,ltoptions,ltsugar,ltversion,lt~obsolete}.m4 >>aclocal.m4
 
 # Force use of system libtool:
-libtoolize --force --copy
-cat `aclocal --print-ac-dir`/{libtool,ltoptions,ltsugar,ltversion,lt~obsolete}.m4 >build/libtool.m4
+%{_bindir}/libtoolize --force --copy
+cat `%{_bindir}/aclocal --print-ac-dir`/{libtool,ltoptions,ltsugar,ltversion,lt~obsolete}.m4 >build/libtool.m4
 
 # Regenerate configure scripts (patches change config.m4's)
 touch configure.in
