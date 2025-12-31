@@ -274,7 +274,7 @@ Patch302: php-openssl-cert.patch
 
 # WIP
 
-BuildRequires: httpd-devel >= 2.0.46-1, php56-runtime, php56-scldevel, php56-build, mariadb-connector-c-devel
+BuildRequires: httpd-devel >= 2.0.46-1, php56-runtime, php56-scldevel, php56-build, mariadb-connector-c-devel, dnf
 %if %{with_httpd2410}
 # to ensure we are using httpd with filesystem feature (see #1081453)
 BuildRequires: httpd-filesystem
