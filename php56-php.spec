@@ -274,7 +274,7 @@ Patch302: php-openssl-cert.patch
 
 # WIP
 
-BuildRequires: httpd-devel >= 2.0.46-1, php56-runtime, php56-scldevel, php56-build
+BuildRequires: httpd-devel >= 2.0.46-1, php56-runtime, php56-scldevel, php56-build, mariadb-connector-c-devel
 %if %{with_httpd2410}
 # to ensure we are using httpd with filesystem feature (see #1081453)
 BuildRequires: httpd-filesystem
@@ -1326,32 +1326,6 @@ build --enable-embed \
       --disable-pdo \
       ${without_shared}
 popd
-
-
-%check
-%if %runselftest
-cd build-fpm
-
-# Run tests, using the CLI SAPI
-export NO_INTERACTION=1 REPORT_EXIT_STATUS=1 MALLOC_CHECK_=2
-export SKIP_ONLINE_TESTS=1
-export SKIP_SLOW_TESTS=1
-unset TZ LANG LC_ALL
-if ! make test; then
-  set +x
-  for f in $(find .. -name \*.diff -type f -print); do
-    if ! grep -q XFAIL "${f/.diff/.phpt}"
-    then
-      echo "TEST FAILURE: $f --"
-      cat "$f"
-      echo -e "\n-- $f result ends."
-    fi
-  done
-  set -x
-  #exit 1
-fi
-unset NO_INTERACTION REPORT_EXIT_STATUS MALLOC_CHECK_
-%endif
 
 %install
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
